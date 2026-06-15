@@ -7,7 +7,7 @@ import { resolveSignal } from "../../chain/committer.ts";
 // predicted direction in the window AFTER the signal. Honest + verifiable from
 // the same proprietary dataset. Matures signals older than MATURE_HOURS.
 
-const MATURE_HOURS = 6;
+const MATURE_HOURS = 1;
 
 export async function resolveMatured() {
   const pending = await sql<
