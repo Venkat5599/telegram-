@@ -1,9 +1,12 @@
 import { TELEGRAM_DEEPLINK, API_BASE } from "@/lib/config";
 import { Reveal } from "./reveal";
 
+// Always render fresh — this is a live stats page; judges must see current data.
+export const dynamic = "force-dynamic";
+
 async function getStats() {
   try {
-    const res = await fetch(`${API_BASE}/score`, { next: { revalidate: 15 } });
+    const res = await fetch(`${API_BASE}/score`, { cache: "no-store" });
     if (!res.ok) throw new Error("bad");
     return (await res.json()) as {
       accuracy: string;
