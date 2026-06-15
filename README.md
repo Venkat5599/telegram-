@@ -78,9 +78,7 @@ Built for the **Turing Test Hackathon 2026 · AI Alpha & Data track** (Mirana Ve
 | Resource | URL |
 |----------|-----|
 | **Landing page (Vercel)** | https://veritas-venkat5599s-projects.vercel.app |
-| **Landing page (VPS)** | http://187.127.137.136:3080 |
 | **Telegram bot** | https://t.me/Subheeksh_bot |
-| **Read / B2B API** | http://187.127.137.136:3001/score · /signals · /index |
 
 ### Smart Contracts — Mantle Sepolia
 
