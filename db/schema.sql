@@ -74,6 +74,9 @@ CREATE TABLE IF NOT EXISTS signals (
   payload      JSONB NOT NULL,        -- raw evidence
   thesis       TEXT,                  -- LLM plain-English
   confidence   SMALLINT NOT NULL,     -- 0-100
+  direction    TEXT,                  -- long | short (predicted price move)
+  entry_price  NUMERIC,               -- USD price at commit time
+  exit_price   NUMERIC,               -- USD price at resolution
   commit_tx    TEXT,                  -- on-chain commit hash
   onchain_id   BIGINT,                -- id assigned by SmartMoneyIndex contract
   signal_hash  TEXT,                  -- bytes32 committed

@@ -21,7 +21,7 @@ Two gaps, one product:
 Veritas runs a **proprietary Mantle indexer** that decodes major protocols + RWA/LST contracts, labels wallets by realized behavior, and detects three signal classes nobody else surfaces. Each signal is:
 - Explained in plain English by an LLM (investor-grade thesis).
 - **Committed on-chain *before* outcome**, then auto-resolved → a public, un-fakeable accuracy score.
-- Delivered via Telegram (gasless onboarding) + a public scoreboard.
+- Delivered via Telegram (zero-install, no signup) + a public scoreboard.
 
 The agent carries an **ERC-8004 identity** and writes a daily **Smart Money Index on-chain**.
 
@@ -51,7 +51,7 @@ Plus **anomaly detection**: abnormal LP concentration (rug risk), redeem spikes,
 | F7 | ERC-8004 agent identity NFT | P0 |
 | F8 | Telegram bot: `/alpha`, `/track`, `/score`, push alerts | P0 |
 | F9 | Public scoreboard page (Next.js) — accuracy + signal history | P0 |
-| F10 | Gasless / AA onboarding | P1 |
+| F10 | One-tap Telegram deep-link from web (zero install) | P0 ✅ |
 | F11 | B2B data API endpoint (read signals/labels) | P1 |
 | F12 | Add 3rd protocol via config-only adapter (scalability proof) | P1 |
 
@@ -78,7 +78,7 @@ Plus **anomaly detection**: abnormal LP concentration (rug risk), redeem spikes,
 - Ecosystem fit 10 → RWA/LST native, on-chain index, ERC-8004.
 - Business 10 → consumer subs + B2B data API.
 - Innovation 10 → verifiable on-chain track record.
-- UX 5 → Telegram + gasless.
+- UX 5 → Telegram, zero-install, one-tap from web.
 
 **Part B — Mirana Path A · Data & Analytics (50)**
 - Insight value 15 → 3 novel signal classes.

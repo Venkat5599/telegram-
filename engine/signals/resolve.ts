@@ -1,58 +1,51 @@
 import { sql } from "../../db/client.ts";
 import { config } from "../../shared/config.ts";
 import { resolveSignal } from "../../chain/committer.ts";
+import { priceOf } from "../price.ts";
 
-// Resolve matured signals using our own indexed data (no external price oracle).
-// Heuristic: a directional signal "won" if the asset's net flow continued in the
-// predicted direction in the window AFTER the signal. Honest + verifiable from
-// the same proprietary dataset. Matures signals older than MATURE_HOURS.
+// Resolve matured signals against a REAL price move. Each signal predicted a
+// direction (long/short) and recorded an entry USD price at commit time. At
+// maturity we compare to the current price: a long wins if price rose past a
+// threshold, a short wins if it fell. Verifiable, methodology a quant accepts.
 
-const MATURE_HOURS = 1;
+const MATURE_MINUTES = 30;
+const THRESHOLD = 0.001; // 0.1% move required to count (filters noise)
 
 export async function resolveMatured() {
   const pending = await sql<
     {
       id: string;
-      type: string;
       payload: any;
+      direction: string | null;
+      entry_price: string | null;
       commit_tx: string | null;
       onchain_id: string | null;
     }[]
   >`
-    SELECT id, type, payload, commit_tx, onchain_id
+    SELECT id, payload, direction, entry_price, commit_tx, onchain_id
     FROM signals
     WHERE outcome = 'pending'
-      AND created_at < now() - interval '${sql.unsafe(`${MATURE_HOURS} hours`)}'
+      AND created_at < now() - interval '${sql.unsafe(`${MATURE_MINUTES} minutes`)}'
     LIMIT 50
   `;
 
   let resolved = 0;
   for (const s of pending) {
     const asset = s.payload?.asset as string | undefined;
-    let won = false;
-
-    if (s.type === "rwa_flow" && asset) {
-      // did net flow continue same sign after the signal?
-      const r = await sql<{ net: string }[]>`
-        SELECT COALESCE(
-          SUM(CASE WHEN kind='mint' THEN amount WHEN kind='redeem' THEN -amount ELSE 0 END),0
-        )::text AS net
-        FROM rwa_flows
-        WHERE asset = ${asset} AND ts > now() - interval '${sql.unsafe(`${MATURE_HOURS} hours`)}'
-      `;
-      const after = Number(r[0]?.net ?? 0);
-      const predicted = Number(s.payload?.data?.net ?? 0);
-      won = Math.sign(after) === Math.sign(predicted) && after !== 0;
-    } else {
-      // rotation / anomaly: continued smart-money inflow on the token
-      const r = await sql<{ net: string }[]>`
-        SELECT COALESCE(SUM(amount),0)::text AS net FROM transfers
-        WHERE token = ${asset ?? ""} AND ts > now() - interval '${sql.unsafe(`${MATURE_HOURS} hours`)}'
-      `;
-      won = Number(r[0]?.net ?? 0) > 0;
+    const entry = s.entry_price ? Number(s.entry_price) : null;
+    const dir = s.direction ?? "long";
+    if (!asset || entry == null) {
+      // can't price it — skip, leave pending (honest: no fake resolution)
+      continue;
     }
 
-    // resolve on-chain using the contract-assigned id (not the DB id)
+    const exit = await priceOf(asset);
+    if (exit == null) continue;
+
+    const change = (exit - entry) / entry;
+    const won =
+      dir === "long" ? change > THRESHOLD : change < -THRESHOLD;
+
     let resolveTx: string | null = null;
     if (s.onchain_id && config.smartMoneyIndexAddr && config.deployerPk) {
       try {
@@ -64,10 +57,18 @@ export async function resolveMatured() {
 
     await sql`
       UPDATE signals
-      SET outcome = ${won ? "won" : "lost"}, resolve_tx = ${resolveTx}, resolved_at = now()
+      SET outcome = ${won ? "won" : "lost"},
+          exit_price = ${exit},
+          resolve_tx = ${resolveTx},
+          resolved_at = now()
       WHERE id = ${s.id}
     `;
     resolved++;
+    console.log(
+      `⚖️  ${asset} ${dir} entry ${entry} -> exit ${exit} (${(change * 100).toFixed(
+        2
+      )}%) = ${won ? "WON" : "LOST"}`
+    );
   }
   console.log(`⚖️  resolved ${resolved} matured signals`);
   return resolved;

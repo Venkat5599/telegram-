@@ -7,6 +7,7 @@ import { config } from "../../shared/config.ts";
 export interface SignalEvidence {
   type: "rwa_flow" | "rotation" | "anomaly";
   asset?: string;
+  direction: "long" | "short"; // predicted price move — drives resolution
   summary: string; // raw numeric facts the detector found
   data: Record<string, unknown>;
 }

@@ -97,7 +97,7 @@ Three detectors:
 ### 2.7 Telegram bot (`/bot`)
 - grammY. Commands: `/alpha`, `/track`, `/score`, `/index`.
 - Push alerts on high-confidence signals.
-- Gasless onboarding (AA) — P1.
+- One-tap Telegram deep-link from the web (zero install, no signup).
 
 ### 2.8 Scoreboard (`/web`)
 - Next.js → Vercel. Public URL (rubric requires non-localhost).
@@ -164,7 +164,7 @@ veritas/
 - **D3:** labeling + signal engine.
 - **D4:** DeepSeek thesis layer.
 - **D5:** contracts + committer + resolver + ERC-8004 (testnet).
-- **D6:** Telegram bot + scoreboard + gasless.
+- **D6:** Telegram bot + scoreboard + web deep-link.
 - **D7:** demo video, README, deploy, polish, submit.
 
 ## 8. Why this architecture scores

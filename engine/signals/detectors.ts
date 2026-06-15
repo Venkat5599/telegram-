@@ -31,6 +31,7 @@ export async function detectRwaFlow(): Promise<SignalEvidence[]> {
     out.push({
       type: "rwa_flow",
       asset: r.asset,
+      direction: net > 0 ? "long" : "short",
       summary: `${r.asset} ${dir} over ${WINDOW}: mint ${mint.toFixed(
         2
       )}, redeem ${redeem.toFixed(2)}, net ${net.toFixed(2)}.`,
@@ -56,6 +57,7 @@ export async function detectRotation(): Promise<SignalEvidence[]> {
   return rows.map((r) => ({
     type: "rotation" as const,
     asset: r.token,
+    direction: "long" as const, // smart-money accumulation = bullish
     summary: `${r.wallets} smart-money wallets accumulated ${Number(
       r.net
     ).toFixed(2)} ${r.token} in the last ${WINDOW}.`,
@@ -86,6 +88,7 @@ export async function detectAnomaly(): Promise<SignalEvidence[]> {
   return rows.map((r) => ({
     type: "anomaly" as const,
     asset: r.token,
+    direction: "long" as const, // large inflow to a wallet = accumulation
     summary: `Anomalous ${r.token} transfer of ${Number(r.amount).toFixed(
       2
     )} (${(Number(r.amount) / Number(r.avg)).toFixed(

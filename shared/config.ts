@@ -29,4 +29,6 @@ export const config = {
 export const MANTLE_ASSETS = [
   { name: "meth", asset: "mETH", address: "0xcDA86A272531e8640cD7F1a92c01839911B90bb0", decimals: 18 },
   { name: "fbtc", asset: "fBTC", address: "0xC96dE26018A54D51c097160568752c4E3BD6C364", decimals: 8 },
+  { name: "cmeth", asset: "cmETH", address: "0xE6829d9a7eE3040e1276Fa75293Bde931859e8fA", decimals: 18 },
+  { name: "usdy", asset: "USDY", address: "0x5bE26527e817998A7206475496fDE1E68957c5A6", decimals: 18 },
 ] as const;

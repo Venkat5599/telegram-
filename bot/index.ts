@@ -22,7 +22,7 @@ bot.command("start", (ctx) => {
 
 bot.command("alpha", async (ctx) => {
   const rows = await sql`
-    SELECT type, thesis, confidence, commit_tx
+    SELECT type, asset, thesis, confidence, direction, commit_tx
     FROM signals
     WHERE outcome = 'pending'
     ORDER BY created_at DESC
@@ -30,14 +30,17 @@ bot.command("alpha", async (ctx) => {
   `;
   if (!rows.length) return ctx.reply("No live signals yet. Indexer warming up.");
   const msg = rows
-    .map(
-      (r: any) =>
-        `*${r.type}* (${r.confidence}%)\n${r.thesis ?? "—"}\n${
+    .map((r: any) => {
+      const arrow = r.direction === "short" ? "🔻 SHORT" : "🔺 LONG";
+      const asset = r.payload?.asset ?? r.asset ?? "";
+      return (
+        `*${r.type}* · ${asset} · ${arrow} · ${r.confidence}%\n${r.thesis ?? "—"}\n${
           r.commit_tx
-            ? `🔗 https://explorer.mantle.xyz/tx/${r.commit_tx}`
+            ? `🔗 Verify on-chain: https://explorer.sepolia.mantle.xyz/tx/${r.commit_tx}`
             : "⏳ committing"
         }`
-    )
+      );
+    })
     .join("\n\n");
   return ctx.reply(msg, { parse_mode: "Markdown" });
 });
