@@ -29,3 +29,5 @@ veritas-*.png
 # web build
 web/.next/
 web/node_modules/
+
+contracts/lib/

@@ -7,6 +7,8 @@
     "indexer": "bun run indexer/index.ts",
     "labeling": "bun run engine/labeling/run.ts",
     "signals": "bun run engine/signals/run.ts",
+    "resolve": "bun run engine/signals/resolve.ts",
+    "orchestrator": "bun run engine/orchestrator.ts",
     "bot": "bun run bot/index.ts",
     "api": "bun run api/index.ts",
     "db:migrate": "bun run db/migrate.ts",
