@@ -24,7 +24,7 @@ module.exports = {
       args: "run start",
       interpreter: "none",
       cwd: __dirname + "/web",
-      env: { PORT: "3000", HOSTNAME: "0.0.0.0" },
+      env: { PORT: "3080", HOSTNAME: "0.0.0.0" },
       autorestart: true,
       max_restarts: 20,
     },
