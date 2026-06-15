@@ -13,6 +13,8 @@ export const config = {
   deployerPk: process.env.DEPLOYER_PK as `0x${string}` | undefined,
   telegramToken: process.env.TELEGRAM_TOKEN,
   deepseekApiKey: process.env.DEEPSEEK_API_KEY,
+  llmBaseUrl: process.env.LLM_BASE_URL ?? "https://api.deepseek.com/v1",
+  llmModel: process.env.LLM_MODEL ?? "deepseek-chat",
   databaseUrl: req("DATABASE_URL"),
   smartMoneyIndexAddr: process.env.SMART_MONEY_INDEX_ADDR as
     | `0x${string}`
