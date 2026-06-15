@@ -35,7 +35,9 @@ Bun.serve({
 
     if (pathname === "/signals") {
       const rows = await sql`
-        SELECT id, type, thesis, confidence, commit_tx, outcome, created_at
+        SELECT id, type, payload->>'asset' AS asset, direction,
+               entry_price, exit_price, thesis, confidence,
+               commit_tx, resolve_tx, outcome, created_at
         FROM signals ORDER BY created_at DESC LIMIT 25
       `;
       return json({ signals: rows });

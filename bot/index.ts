@@ -22,7 +22,7 @@ bot.command("start", (ctx) => {
 
 bot.command("alpha", async (ctx) => {
   const rows = await sql`
-    SELECT type, asset, thesis, confidence, direction, commit_tx
+    SELECT type, payload->>'asset' AS asset, thesis, confidence, direction, commit_tx
     FROM signals
     WHERE outcome = 'pending'
     ORDER BY created_at DESC
@@ -32,7 +32,7 @@ bot.command("alpha", async (ctx) => {
   const msg = rows
     .map((r: any) => {
       const arrow = r.direction === "short" ? "🔻 SHORT" : "🔺 LONG";
-      const asset = r.payload?.asset ?? r.asset ?? "";
+      const asset = r.asset ?? "";
       return (
         `*${r.type}* · ${asset} · ${arrow} · ${r.confidence}%\n${r.thesis ?? "—"}\n${
           r.commit_tx
