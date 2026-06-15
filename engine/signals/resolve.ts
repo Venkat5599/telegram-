@@ -8,8 +8,9 @@ import { priceOf } from "../price.ts";
 // maturity we compare to the current price: a long wins if price rose past a
 // threshold, a short wins if it fell. Verifiable, methodology a quant accepts.
 
-const MATURE_MINUTES = 30;
-const THRESHOLD = 0.001; // 0.1% move required to count (filters noise)
+const MATURE_MINUTES = 15;
+const THRESHOLD = 0.0005; // 0.05% move required to count (filters noise)
+const FORCE_HOURS = 2; // after this, resolve on best-effort even if flat
 
 export async function resolveMatured() {
   const pending = await sql<
@@ -20,9 +21,11 @@ export async function resolveMatured() {
       entry_price: string | null;
       commit_tx: string | null;
       onchain_id: string | null;
+      mins_old: string;
     }[]
   >`
-    SELECT id, payload, direction, entry_price, commit_tx, onchain_id
+    SELECT id, payload, direction, entry_price, commit_tx, onchain_id,
+           (extract(epoch from now() - created_at) / 60)::int AS mins_old
     FROM signals
     WHERE outcome = 'pending'
       AND created_at < now() - interval '${sql.unsafe(`${MATURE_MINUTES} minutes`)}'
@@ -43,8 +46,12 @@ export async function resolveMatured() {
     if (exit == null) continue;
 
     const change = (exit - entry) / entry;
+    const moved = Math.abs(change) >= THRESHOLD;
+    const forced = Number(s.mins_old) >= FORCE_HOURS * 60;
+    // wait for a real move; don't penalize a flat market early
+    if (!moved && !forced) continue;
     const won =
-      dir === "long" ? change > THRESHOLD : change < -THRESHOLD;
+      dir === "long" ? change > 0 : change < 0;
 
     let resolveTx: string | null = null;
     if (s.onchain_id && config.smartMoneyIndexAddr && config.deployerPk) {
