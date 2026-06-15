@@ -24,10 +24,9 @@ export const config = {
     | undefined,
 };
 
-// Known Mantle mainnet asset addresses (RWA / LST focus — the moat).
-// Verify on Mantle Explorer before relying in production.
-export const MANTLE_ASSETS = {
-  mETH: "0xcDA86A272531e8640cD7F1a92c01839911B90bb0",
-  fBTC: "0xC96dE26018A54D51c097160568752c4E3BD6C364",
-  // add: cmETH, MI4, USDY (fill verified addresses)
-} as const;
+// Known Mantle mainnet RWA/LST assets (the moat). Verified on-chain
+// (symbol + decimals) 2026-06-15. Add cmETH, MI4, USDY here with verified data.
+export const MANTLE_ASSETS = [
+  { name: "meth", asset: "mETH", address: "0xcDA86A272531e8640cD7F1a92c01839911B90bb0", decimals: 18 },
+  { name: "fbtc", asset: "fBTC", address: "0xC96dE26018A54D51c097160568752c4E3BD6C364", decimals: 8 },
+] as const;

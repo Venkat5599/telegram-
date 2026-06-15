@@ -1,15 +1,14 @@
 import { createPublicClient, http } from "viem";
 import { mantle } from "../shared/chains.ts";
-import { config } from "../shared/config.ts";
+import { config, MANTLE_ASSETS } from "../shared/config.ts";
 import { sql } from "../db/client.ts";
 import type { Adapter } from "./adapters/types.ts";
-import { methAdapter } from "./adapters/meth.ts";
+import { erc20FlowAdapter } from "./adapters/erc20Flow.ts";
 
-// Register adapters here. Add a protocol = add one line. (Scalability)
-const adapters: Adapter[] = [
-  methAdapter,
-  // agniAdapter, merchantMoeAdapter, fbtcAdapter ...
-];
+// Register adapters. Each RWA/LST asset is one entry in MANTLE_ASSETS.
+const adapters: Adapter[] = MANTLE_ASSETS.map((a) =>
+  erc20FlowAdapter({ name: a.name, asset: a.asset, address: a.address, decimals: a.decimals })
+);
 
 const client = createPublicClient({
   chain: mantle,
