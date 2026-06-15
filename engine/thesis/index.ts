@@ -63,9 +63,11 @@ export async function generateThesis(ev: SignalEvidence): Promise<Thesis> {
   const raw = json.choices?.[0]?.message?.content ?? "{}";
   try {
     const parsed = JSON.parse(raw) as Thesis;
+    let conf = parsed.confidence ?? 50;
+    if (conf > 0 && conf <= 1) conf *= 100; // some models return 0-1 scale
     return {
       thesis: parsed.thesis ?? ev.summary,
-      confidence: Math.max(0, Math.min(100, Math.round(parsed.confidence ?? 50))),
+      confidence: Math.max(0, Math.min(100, Math.round(conf))),
     };
   } catch {
     return { thesis: raw.slice(0, 280), confidence: 50 };
