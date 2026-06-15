@@ -18,6 +18,9 @@ const client = createPublicClient({
 
 const BATCH = 2000n; // blocks per range; tune per RPC limits
 const POLL_MS = 15_000;
+// On a fresh DB, start this many blocks behind head instead of genesis, so we
+// capture recent live flows immediately (Mantle ~2s/block → ~100k ≈ 2-3 days).
+const BACKFILL = 100_000n;
 
 async function getLastBlock(name: string, fallback: bigint): Promise<bigint> {
   const rows = await sql`SELECT last_block FROM indexer_state WHERE adapter = ${name}`;
@@ -37,7 +40,9 @@ async function setLastBlock(name: string, block: bigint) {
 async function tick() {
   const head = await client.getBlockNumber();
   for (const a of adapters) {
-    let from = (await getLastBlock(a.name, a.startBlock)) + 1n;
+    const fresh = head > BACKFILL ? head - BACKFILL : a.startBlock;
+    const start = a.startBlock > fresh ? a.startBlock : fresh;
+    let from = (await getLastBlock(a.name, start)) + 1n;
     if (from > head) continue;
     while (from <= head) {
       const to = from + BATCH - 1n > head ? head : from + BATCH - 1n;
