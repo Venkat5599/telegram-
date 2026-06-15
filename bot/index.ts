@@ -66,12 +66,65 @@ bot.command("score", async (ctx) => {
 });
 
 bot.command("index", async (ctx) => {
-  return ctx.reply("📈 Smart Money Index — on-chain publish coming after deploy.");
+  // Smart Money Index = total USD-weighted accumulation by the labeled cohort.
+  const rows = await sql`
+    SELECT COUNT(*) AS wallets, COALESCE(SUM(realized_pnl),0)::numeric AS usd
+    FROM wallet_labels WHERE label = 'smart_money'
+  `;
+  const { wallets, usd } = rows[0] as any;
+  const val = Number(usd);
+  return ctx.reply(
+    `📈 *Smart Money Index*\n` +
+      `${wallets} tracked smart-money wallets on Mantle\n` +
+      `Net USD accumulation: *$${val.toLocaleString(undefined, {
+        maximumFractionDigits: 0,
+      })}*\n` +
+      `_Across mETH · fBTC · cmETH · USDY_`,
+    { parse_mode: "Markdown" }
+  );
 });
 
-bot.command("track", (ctx) =>
-  ctx.reply("Wallet tracking — wiring in next build step.")
-);
+bot.command("track", async (ctx) => {
+  const addr = ctx.match?.toString().trim().toLowerCase();
+  if (!addr || !/^0x[0-9a-f]{40}$/.test(addr)) {
+    return ctx.reply("Usage: `/track 0x<wallet address>`", {
+      parse_mode: "Markdown",
+    });
+  }
+  const label = await sql`
+    SELECT label, realized_pnl, score, cluster FROM wallet_labels
+    WHERE lower(address) = ${addr}
+  `;
+  const moves = await sql`
+    SELECT token, from_addr, to_addr, amount, ts FROM transfers
+    WHERE lower(from_addr) = ${addr} OR lower(to_addr) = ${addr}
+    ORDER BY ts DESC LIMIT 5
+  `;
+  if (!label.length && !moves.length) {
+    return ctx.reply(
+      `No indexed activity for \`${addr}\` on tracked Mantle assets yet.`,
+      { parse_mode: "Markdown" }
+    );
+  }
+  let msg = `👤 *Wallet* \`${addr.slice(0, 10)}…${addr.slice(-6)}\`\n`;
+  if (label.length) {
+    const l = label[0] as any;
+    const tag = l.label === "smart_money" ? "🟢 SMART MONEY" : l.label;
+    msg += `Status: *${tag}* · score ${l.score}/100\nNet USD: $${Number(
+      l.realized_pnl
+    ).toLocaleString(undefined, { maximumFractionDigits: 0 })}\n`;
+  } else {
+    msg += `Status: not in smart-money cohort\n`;
+  }
+  if (moves.length) {
+    msg += `\n*Recent moves:*\n`;
+    for (const m of moves as any[]) {
+      const dir = m.to_addr.toLowerCase() === addr ? "↓ in " : "↑ out";
+      msg += `${dir} ${Number(m.amount).toFixed(3)} ${m.token}\n`;
+    }
+  }
+  return ctx.reply(msg, { parse_mode: "Markdown" });
+});
 
 bot.catch((err) => console.error("bot error:", err));
 

@@ -44,8 +44,12 @@ Bun.serve({
     }
 
     if (pathname === "/index") {
-      // placeholder until SmartMoneyIndex.sol publishes on-chain
-      return json({ value: null, note: "pending on-chain publish" });
+      const r = await sql`
+        SELECT COUNT(*) AS wallets, COALESCE(SUM(realized_pnl),0)::numeric AS usd
+        FROM wallet_labels WHERE label = 'smart_money'
+      `;
+      const { wallets, usd } = r[0] as any;
+      return json({ wallets: Number(wallets), netUsd: Number(usd) });
     }
 
     return json({ error: "not found" }, 404);
