@@ -18,5 +18,15 @@ module.exports = {
     opts("veritas-brain", "engine/orchestrator.ts"),
     opts("veritas-api", "api/index.ts"),
     opts("veritas-bot", "bot/index.ts"),
+    {
+      name: "veritas-web",
+      script: "bun",
+      args: "run start",
+      interpreter: "none",
+      cwd: __dirname + "/web",
+      env: { PORT: "3000", HOSTNAME: "0.0.0.0" },
+      autorestart: true,
+      max_restarts: 20,
+    },
   ],
 };
