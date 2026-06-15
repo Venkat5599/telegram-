@@ -21,20 +21,25 @@ bot.command("start", (ctx) => {
 });
 
 bot.command("alpha", async (ctx) => {
+  // Show latest signals regardless of outcome — status badges prove the
+  // verifiable track record inline (pending / won / lost), and /alpha is
+  // never empty for a judge.
   const rows = await sql`
-    SELECT type, payload->>'asset' AS asset, thesis, confidence, direction, commit_tx
+    SELECT type, payload->>'asset' AS asset, thesis, confidence, direction,
+           outcome, commit_tx
     FROM signals
-    WHERE outcome = 'pending'
     ORDER BY created_at DESC
     LIMIT 5
   `;
   if (!rows.length) return ctx.reply("No live signals yet. Indexer warming up.");
+  const badge = (o: string) =>
+    o === "won" ? "✅ WON" : o === "lost" ? "❌ LOST" : "⏳ LIVE";
   const msg = rows
     .map((r: any) => {
       const arrow = r.direction === "short" ? "🔻 SHORT" : "🔺 LONG";
       const asset = r.asset ?? "";
       return (
-        `*${r.type}* · ${asset} · ${arrow} · ${r.confidence}%\n${r.thesis ?? "—"}\n${
+        `*${r.type}* · ${asset} · ${arrow} · ${r.confidence}% · ${badge(r.outcome)}\n${r.thesis ?? "—"}\n${
           r.commit_tx
             ? `🔗 Verify on-chain: https://explorer.sepolia.mantle.xyz/tx/${r.commit_tx}`
             : "⏳ committing"

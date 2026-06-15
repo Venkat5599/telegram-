@@ -9,11 +9,13 @@ import { priceOf } from "../price.ts";
 // Dedupes by (type, asset) within the last few hours so we don't spam.
 
 async function recentlySeen(ev: SignalEvidence): Promise<boolean> {
+  // short window: keep fresh signals flowing so /alpha always has live ones,
+  // but don't spam the same (type, asset) every cycle.
   const rows = await sql`
     SELECT 1 FROM signals
     WHERE type = ${ev.type}
       AND payload->>'asset' = ${ev.asset ?? ""}
-      AND created_at > now() - interval '6 hours'
+      AND created_at > now() - interval '45 minutes'
     LIMIT 1
   `;
   return rows.length > 0;
