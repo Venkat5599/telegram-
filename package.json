@@ -1,0 +1,25 @@
+{
+  "name": "veritas",
+  "version": "0.1.0",
+  "description": "Verifiable smart-money intelligence for the Mantle economy",
+  "type": "module",
+  "scripts": {
+    "indexer": "bun run indexer/index.ts",
+    "labeling": "bun run engine/labeling/run.ts",
+    "signals": "bun run engine/signals/run.ts",
+    "bot": "bun run bot/index.ts",
+    "api": "bun run api/index.ts",
+    "db:migrate": "bun run db/migrate.ts",
+    "web:dev": "cd web && bun run dev"
+  },
+  "dependencies": {
+    "viem": "^2.21.0",
+    "grammy": "^1.30.0",
+    "postgres": "^3.4.4",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.6.0"
+  }
+}

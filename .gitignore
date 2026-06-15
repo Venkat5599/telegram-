@@ -1,0 +1,31 @@
+# secrets — NEVER commit
+.env
+.env.*
+!.env.example
+
+# deps
+node_modules/
+bun.lockb
+
+# build
+dist/
+.next/
+out/
+
+# foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# misc
+*.log
+.DS_Store
+
+# screenshots / playwright
+.playwright-mcp/
+veritas-*.jpeg
+veritas-*.png
+
+# web build
+web/.next/
+web/node_modules/
