@@ -1,5 +1,15 @@
 export const smartMoneyIndexAbi = [
   {
+    type: "event",
+    name: "Committed",
+    inputs: [
+      { name: "id", type: "uint256", indexed: true },
+      { name: "hash", type: "bytes32", indexed: false },
+      { name: "confidence", type: "uint8", indexed: false },
+      { name: "ts", type: "uint64", indexed: false },
+    ],
+  },
+  {
     type: "function",
     name: "commitSignal",
     stateMutability: "nonpayable",

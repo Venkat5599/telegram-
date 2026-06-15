@@ -11,9 +11,15 @@ const MATURE_HOURS = 6;
 
 export async function resolveMatured() {
   const pending = await sql<
-    { id: string; type: string; payload: any; commit_tx: string | null }[]
+    {
+      id: string;
+      type: string;
+      payload: any;
+      commit_tx: string | null;
+      onchain_id: string | null;
+    }[]
   >`
-    SELECT id, type, payload, commit_tx
+    SELECT id, type, payload, commit_tx, onchain_id
     FROM signals
     WHERE outcome = 'pending'
       AND created_at < now() - interval '${sql.unsafe(`${MATURE_HOURS} hours`)}'
@@ -46,12 +52,11 @@ export async function resolveMatured() {
       won = Number(r[0]?.net ?? 0) > 0;
     }
 
-    // resolve on-chain if it was committed
+    // resolve on-chain using the contract-assigned id (not the DB id)
     let resolveTx: string | null = null;
-    if (s.commit_tx && config.smartMoneyIndexAddr && config.deployerPk) {
+    if (s.onchain_id && config.smartMoneyIndexAddr && config.deployerPk) {
       try {
-        // on-chain id == DB id (both monotonic from same committer)
-        resolveTx = await resolveSignal(BigInt(s.id), won);
+        resolveTx = await resolveSignal(BigInt(s.onchain_id), won);
       } catch (e) {
         console.error("resolve tx failed:", (e as Error).message);
       }

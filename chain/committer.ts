@@ -4,6 +4,7 @@ import {
   http,
   keccak256,
   toHex,
+  parseEventLogs,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { mantleSepolia } from "../shared/chains.ts";
@@ -31,11 +32,11 @@ export function hashSignal(payload: unknown): `0x${string}` {
   return keccak256(toHex(JSON.stringify(payload)));
 }
 
-/** Commit one signal hash on-chain. Returns tx hash. */
+/** Commit one signal hash on-chain. Returns tx hash + the on-chain signal id. */
 export async function commitSignal(
   payload: unknown,
   confidence: number
-): Promise<`0x${string}`> {
+): Promise<{ txHash: `0x${string}`; onchainId: bigint; hash: `0x${string}` }> {
   const { wallet, pub, addr } = clients();
   const hash = hashSignal(payload);
   const txHash = await wallet.writeContract({
@@ -44,8 +45,14 @@ export async function commitSignal(
     functionName: "commitSignal",
     args: [hash, Math.max(0, Math.min(100, Math.round(confidence)))],
   });
-  await pub.waitForTransactionReceipt({ hash: txHash });
-  return txHash;
+  const receipt = await pub.waitForTransactionReceipt({ hash: txHash });
+  const logs = parseEventLogs({
+    abi: smartMoneyIndexAbi,
+    eventName: "Committed",
+    logs: receipt.logs,
+  });
+  const onchainId = (logs[0]?.args as { id?: bigint })?.id ?? 0n;
+  return { txHash, onchainId, hash };
 }
 
 /** Resolve a signal on-chain (won/lost). Returns tx hash. */

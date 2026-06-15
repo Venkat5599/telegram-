@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS signals (
   thesis       TEXT,                  -- LLM plain-English
   confidence   SMALLINT NOT NULL,     -- 0-100
   commit_tx    TEXT,                  -- on-chain commit hash
+  onchain_id   BIGINT,                -- id assigned by SmartMoneyIndex contract
   signal_hash  TEXT,                  -- bytes32 committed
   outcome      TEXT,                  -- pending | won | lost
   resolve_tx   TEXT,

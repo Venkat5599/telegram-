@@ -2,7 +2,7 @@ import { sql } from "../../db/client.ts";
 import { config } from "../../shared/config.ts";
 import { generateThesis, type SignalEvidence } from "../thesis/index.ts";
 import { detectRwaFlow, detectRotation, detectAnomaly } from "./detectors.ts";
-import { commitSignal, hashSignal } from "../../chain/committer.ts";
+import { commitSignal } from "../../chain/committer.ts";
 
 // Full signal pipeline: detect -> thesis (LLM) -> commit on-chain -> store.
 // Dedupes by (type, asset) within the last few hours so we don't spam.
@@ -35,19 +35,22 @@ export async function runSignals() {
     // commit on-chain if contract is deployed; otherwise store unverified
     let commitTx: string | null = null;
     let signalHash: string | null = null;
+    let onchainId: string | null = null;
     if (config.smartMoneyIndexAddr && config.deployerPk) {
       try {
-        commitTx = await commitSignal(payload, confidence);
-        signalHash = hashSignal(payload);
+        const res = await commitSignal(payload, confidence);
+        commitTx = res.txHash;
+        signalHash = res.hash;
+        onchainId = res.onchainId.toString();
       } catch (e) {
         console.error("commit failed:", (e as Error).message);
       }
     }
 
     await sql`
-      INSERT INTO signals (type, payload, thesis, confidence, commit_tx, signal_hash, outcome)
+      INSERT INTO signals (type, payload, thesis, confidence, commit_tx, onchain_id, signal_hash, outcome)
       VALUES (${ev.type}, ${sql.json(payload as any)}, ${thesis}, ${confidence},
-              ${commitTx}, ${signalHash}, 'pending')
+              ${commitTx}, ${onchainId}, ${signalHash}, 'pending')
     `;
     created++;
     console.log(`📡 ${ev.type} ${ev.asset ?? ""} (${confidence}%)${commitTx ? " ⛓" : ""}`);
