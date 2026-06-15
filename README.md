@@ -19,6 +19,9 @@
   <a href="https://t.me/Subheeksh_bot?start=judge">
     <img src="https://img.shields.io/badge/Telegram-@Subheeksh__bot-229ED9?style=for-the-badge&logo=telegram" alt="Telegram" />
   </a>
+  <a href="https://sepolia.mantlescan.xyz/address/0x8F8eB4bdd9C53b33296407e4F5939AdF5a384609#code">
+    <img src="https://img.shields.io/badge/✅_VERIFIED-Smart_Contracts-00FF88?style=for-the-badge" alt="Verified" />
+  </a>
   <img src="https://img.shields.io/badge/Mantle-Sepolia-000000?style=for-the-badge" alt="Mantle" />
   <img src="https://img.shields.io/badge/Solidity-0.8.24-363636?style=for-the-badge&logo=solidity" alt="Solidity" />
 </p>
@@ -81,10 +84,10 @@ Built for the **Turing Test Hackathon 2026 · AI Alpha & Data track** (Mirana Ve
 
 ### Smart Contracts — Mantle Sepolia
 
-| Contract | Address |
-|----------|---------|
-| **SmartMoneyIndex** | [`0x8F8eB4bdd9C53b33296407e4F5939AdF5a384609`](https://explorer.sepolia.mantle.xyz/address/0x8F8eB4bdd9C53b33296407e4F5939AdF5a384609) |
-| **AgentIdentity (ERC-8004)** | [`0xe6E95B427fAb972c3Dc4b61c9CA6852A09B7dfF9`](https://explorer.sepolia.mantle.xyz/address/0xe6E95B427fAb972c3Dc4b61c9CA6852A09B7dfF9) |
+| Contract | Address | Verified |
+|----------|---------|----------|
+| **SmartMoneyIndex** | `0x8F8eB4bdd9C53b33296407e4F5939AdF5a384609` | [✅ View Code](https://sepolia.mantlescan.xyz/address/0x8F8eB4bdd9C53b33296407e4F5939AdF5a384609#code) |
+| **AgentIdentity (ERC-8004)** | `0xe6E95B427fAb972c3Dc4b61c9CA6852A09B7dfF9` | [✅ View Code](https://sepolia.mantlescan.xyz/address/0xe6E95B427fAb972c3Dc4b61c9CA6852A09B7dfF9#code) |
 
 ```
 Network:   Mantle Sepolia
@@ -217,7 +220,7 @@ Deploy all services on a VPS with pm2: `pm2 start ecosystem.config.cjs`.
 - [x] ERC-8004 agent identity
 - [x] Telegram bot + public web dashboard + B2B API
 - [x] Deployed live (VPS + Vercel + Mantle Sepolia)
-- [ ] Verify contracts on explorer
+- [x] Contracts verified on Mantlescan
 - [ ] More assets + DEX (Merchant Moe, Agni) adapters
 - [ ] Longer resolution horizons + risk-adjusted scoring
 

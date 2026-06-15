@@ -78,7 +78,7 @@ DoraHacks AI auto-screens incomplete submissions — fill EVERYTHING.
 
 ### 20 Project Deployment Award (separate, no judging)
 - [x] Smart contract on Mantle (testnet ok)
-- [ ] Contract **verified** on explorer (Blockscout was 503 — retry; or use mantlescan API key. Flattened source in `contracts/flat/`)
+- [x] Contract **verified** on Mantlescan (https://sepolia.mantlescan.xyz/address/0x8F8eB4bdd9C53b33296407e4F5939AdF5a384609#code)
 - [x] AI function callable on-chain
 - [x] Frontend publicly accessible
 - [ ] Deployment address in submission
