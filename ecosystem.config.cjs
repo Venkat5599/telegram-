@@ -1,11 +1,22 @@
 // pm2 process map for the VPS. Run: pm2 start ecosystem.config.cjs
-const bun = process.env.BUN_PATH || "bun";
+// Use `bun run <file>` via interpreter:none so pm2 doesn't require() modules
+// that use top-level await (indexer/orchestrator) — which bun's fork wrapper
+// cannot load.
+const opts = (name, file) => ({
+  name,
+  script: "bun",
+  args: `run ${file}`,
+  interpreter: "none",
+  cwd: __dirname,
+  autorestart: true,
+  max_restarts: 20,
+});
 
 module.exports = {
   apps: [
-    { name: "veritas-indexer", script: "indexer/index.ts", interpreter: bun },
-    { name: "veritas-brain", script: "engine/orchestrator.ts", interpreter: bun },
-    { name: "veritas-api", script: "api/index.ts", interpreter: bun },
-    { name: "veritas-bot", script: "bot/index.ts", interpreter: bun },
+    opts("veritas-indexer", "indexer/index.ts"),
+    opts("veritas-brain", "engine/orchestrator.ts"),
+    opts("veritas-api", "api/index.ts"),
+    opts("veritas-bot", "bot/index.ts"),
   ],
 };
